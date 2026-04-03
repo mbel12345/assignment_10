@@ -5,8 +5,10 @@ import sys
 from sqlalchemy import text
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import declarative_base, sessionmaker
 from unittest.mock import MagicMock, patch
+
+from app.base import Base
 
 DATABASE_MODULE = 'app.database'
 
@@ -33,10 +35,9 @@ def reload_database_module():
 
 def test_base_declaration(mock_settings):
 
-    # Test that Base is in instnace of declarative_base.
+    # Test that Base is in instance of declarative_base.
 
-    database = reload_database_module()
-    assert isinstance(database.Base, database.declarative_base().__class__)
+    assert isinstance(Base, declarative_base().__class__)
 
 def test_get_engine_success(mock_settings):
 

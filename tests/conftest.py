@@ -7,8 +7,9 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from typing import Dict, Generator
 
+from app.base import Base
 from app.config import settings
-from app.database import Base, get_engine, get_sessionmaker
+from app.database import get_engine, get_sessionmaker
 
 # Set up logging
 logging.basicConfig(

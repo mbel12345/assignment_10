@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.orm import sessionmaker
 
 from app.config import settings
 
@@ -32,9 +32,6 @@ def get_sessionmaker(engine):
 # Initialize engine and SessionLocal
 engine = get_engine()
 SessionLocal = get_sessionmaker(engine)
-
-# All models will inherit from this
-Base = declarative_base()
 
 def get_db():
 
