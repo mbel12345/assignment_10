@@ -24,3 +24,9 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
+
+## Run application
+In WSL/VS Code Terminal:
+```bash
+docker compose up
+```
