@@ -6,6 +6,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from unittest.mock import patch
 
+from app.get_secret import get_secret
 from app.models.user import User
 from app.schemas.base import get_clean_user
 from tests.conftest import create_fake_user
@@ -347,3 +348,10 @@ def test_get_clean_user(db_session):
         'last_name',
         'username',
     ]
+
+def test_get_unknown_secret():
+
+    # Test an attempt to fetch a secret that does not exist
+
+    with pytest.raises(ValueError, match='Unknown secret: fake_secret'):
+        get_secret('fake_secret')
