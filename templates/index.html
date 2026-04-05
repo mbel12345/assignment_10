@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Hello World & Calculator Demo</title>
+    <style>
+
+        /*
+        Set the style of the elements on the page
+        */
+
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .calculator {
+            margin-top: 30px;
+        }
+
+        input {
+            margin: 5px;
+            padding: 5px;
+        }
+
+        button {
+            padding: 5px 10px;
+        }
+
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+
+<body>
+    <!-- Define/layout the elements of the webpage -->
+    <h1>Hello World</h1>
+    <div class="calculator">
+        <h2>Calculator</h2>
+        <!-- The two inputs for the numbers that will be used in the operation -->
+        <input type="number" id="a", placeholders="First number">
+        <input type="number" id="b", placeholders="Second number">
+        <!-- The buttons that define which operation will be done -->
+        <button onclick="calculate('add')">Add</button>
+        <button onclick="calculate('subtract')">Subtract</button>
+        <button onclick="calculate('multiply')">Multiply</button>
+        <button onclick="calculate('divide')">Divide</button>
+        <!-- Show output -->
+        <div class="result" id="result"></div>
+    </div>
+
+    <!-- Javascript -->
+    <script>
+
+        async function calculate(operation) {
+
+            /*
+                Retrieve the values from #a and #b boxes and perform the operation on them.
+                This is done by sending the values to the FastAPI endpoint.
+                If successful, return the response as JSON and display it in #result.
+                If error, display the error message.
+            */
+
+            const a = parseFloat(document.getElementById('a').value);
+            const b = parseFloat(document.getElementById('b').value);
+            const resultElement = document.getElementById('result')
+
+            try {
+
+                // Send a and b to the POST request corresponding to operation.
+                const response = await fetch('/' + operation, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({a: a, b: b})
+                });
+
+                // Wait for the response
+                const data = await response.json();
+
+                // Log the response status and data to the browser's console and display for the user
+                console.log('Response Status:', response.status);
+                console.log('Response Data:', data);
+
+                if (response.ok) {
+                    resultElement.innerText = 'Calculation Result: ' + data.result;
+                } else {
+                    resultElement.innerText = 'Error: ' + data.error;
+                }
+            } catch (error) {
+
+                // Log the error to the browser's console and display for the user
+                console.error('Fetch error: ', error);
+                resultElement.innerText = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+
+</html>
