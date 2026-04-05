@@ -44,7 +44,7 @@ def create_fake_user() -> Dict[str, str]:
         'last_name': fake.last_name(),
         'email': fake.unique.email(),
         'username': fake.unique.user_name(),
-        'password': fake.password(length=12),
+        'password_hash': fake.password(length=12),
     }
 
 @contextmanager

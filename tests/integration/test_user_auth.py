@@ -14,7 +14,7 @@ def test_password_hashing(fake_user_data):
         last_name=fake_user_data['last_name'],
         email=fake_user_data['email'],
         username=fake_user_data['username'],
-        password=hashed,
+        password_hash=hashed,
     )
     assert user.verify_password(original_password) is True
     assert user.verify_password('WrongPass123') is False
