@@ -1,3 +1,5 @@
+import psycopg2
+
 from app.base import Base
 
 def init_db(engine):
@@ -6,7 +8,10 @@ def init_db(engine):
 
 def drop_db(engine):
 
-    Base.metadata.drop_all(bind=engine)
+    try:
+        Base.metadata.drop_all(bind=engine)
+    except psycopg2.OperationalError as e:
+        print(f'Warning: {str(e)}')
 
 if __name__ == '__main__':
 
