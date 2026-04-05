@@ -55,4 +55,4 @@ Add these environment variables in Github:
   - POSTGRES_USER = postgres
   - POSTGRES_PASSWORD = postgres
 
-NOTE: Do all github actions work on main branch, to eliminate the manual steps of merging a pull request to test any changes. In a real DEV environment at work, feature branches should still be used.
+NOTE: Do all github actions work on main branch, to eliminate the manual steps of merging a PR to test any changes. In a real DEV environment at work, feature branches should still be used.
