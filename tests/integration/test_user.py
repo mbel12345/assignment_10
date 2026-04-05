@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from unittest.mock import patch
 
 from app.models.user import User
+from app.schemas.base import get_clean_user
 from tests.conftest import create_fake_user
 from tests.conftest import managed_db_session
 
@@ -320,3 +321,29 @@ def test_authenticate_no_matching_user(db_session):
     # Test that authentication returns None if there is no matching user
 
     assert User.authenticate(db_session, 'fake_user_12345', 'password') is None
+
+def test_get_clean_user(db_session):
+
+    # Create a User using Faker-generated data and verify it is accessible (without password) in a UserRead class
+
+    user_data = create_fake_user()
+    logger.info(f'Creating user with data: {user_data}')
+
+    user = User(**user_data)
+    db_session.add(user)
+    db_session.commit()
+    db_session.refresh(user)
+
+    user_read = get_clean_user(user)
+
+    assert user_read.first_name == user_data['first_name']
+    assert user_read.last_name == user_data['last_name']
+    assert user_read.email == user_data['email']
+    assert user_read.username == user_data['username']
+
+    assert sorted(list(user_read.model_fields.keys())) == [
+        'email',
+        'first_name',
+        'last_name',
+        'username',
+    ]
