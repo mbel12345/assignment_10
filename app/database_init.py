@@ -1,4 +1,5 @@
 import psycopg2
+import sqlalchemy
 
 from app.base import Base
 
@@ -10,7 +11,7 @@ def drop_db(engine):
 
     try:
         Base.metadata.drop_all(bind=engine)
-    except psycopg2.OperationalError as e:
+    except (psycopg2.OperationalError, sqlalchemy.exc.OperationalError) as e:
         print(f'Warning: {str(e)}')
 
 if __name__ == '__main__':
