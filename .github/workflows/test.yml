@@ -15,8 +15,8 @@ jobs:
       postgres:
         image: postgres:latest
         env:
-          POSTGRES_USER: user
-          POSTGRES_PASSWORD: password
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DB: mytestdb
         ports:
           - 5432:5432
@@ -44,7 +44,7 @@ jobs:
 
       - name: Install dependencies
         env:
-          DATABASE_URL: postgresql://user:password@localhost:5432/mytestdb
+          DATABASE_URL: postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/mytestdb
         run: |
           python -m venv venv
           source venv/bin/activate
