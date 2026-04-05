@@ -1,5 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel, ConfigDict, EmailStr
+from typing import Optional
 from uuid import UUID
 
 class UserResponse(BaseModel):
@@ -45,3 +46,9 @@ class Token(BaseModel):
             },
         },
     )
+
+class TokenData(BaseModel):
+
+    # Schema for JWT payload
+
+    user_id: Optional[UUID] = None
