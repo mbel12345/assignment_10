@@ -1,8 +1,12 @@
 import logging
 import pytest
+import requests
+import subprocess
+import time
 
 from contextlib import contextmanager
 from faker import Faker
+from playwright.sync_api import Browser, sync_playwright
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from typing import Dict, Generator, List
@@ -149,6 +153,106 @@ def seed_users(db_session: Session, request) -> List[User]:
     db_session.commit()
     logger.info(f'Seeded {len(users)} users into the test database')
     return users
+
+'''
+FastAPI fixtures
+'''
+
+class ServerStartupError(Exception):
+
+    # Raised when the test server fails to start properly
+
+    pass
+
+def wait_for_server(url: str, timeout: int = 30) -> bool:
+
+    # Wait for server to be ready, and raise an error if this never happens
+
+    start_time = time.time()
+    while (time.time() - start_time) < timeout:
+        try:
+            response = requests.get(url)
+            if response.status_code == 200:
+                return True
+        except requests.exceptions.ConnectionError:
+            pass
+        time.sleep(1)
+    return False
+
+@pytest.fixture(scope='session')
+def fastapi_server():
+
+    # Start and manage a FastAPI test server for integration tests
+
+    server_url = 'http://127.0.0.1:8000/'
+    logger.info('Starting test server...')
+
+    try:
+        process = subprocess.Popen(
+            ['python', 'main.py'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        if not wait_for_server(server_url, timeout=30):
+            raise ServerStartupError('Failed to start test server')
+
+        logger.info('Test server started successfully.')
+        yield
+
+    except Exception as e:
+
+        logger.error(f'Server error: {str(e)}')
+        raise
+
+    finally:
+
+        logger.info('Terminating test server...')
+        process.terminate()
+        try:
+            process.wait(timeout=5)
+            logger.info('Test server terminated gracefully.')
+        except subprocess.TimeoutExpired:
+            logger.warning('Test server did not terminate in time; killing it.')
+            process.kill()
+
+@pytest.fixture(scope='session')
+def browser_context():
+
+    # Provide a Playwright browswer context for UI tests.
+
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch(
+            headless=True,
+            args=['--no-sandbox', '--disable-dev-shm-usage'],
+        )
+        logger.info('Pllaywright browser launched.')
+        try:
+            yield browser
+        finally:
+            logger.info('Closing Playwright browser.')
+            browser.close()
+
+@pytest.fixture
+def page(browser_context: Browser):
+
+    # Return a new browser page for each test
+
+    context = browser_context.new_context(
+        viewport={'width': 1920, 'height': 1080},
+        ignore_https_errors=True,
+    )
+    page = context.new_page()
+    logger.info('Created new browser page.')
+    try:
+        yield page
+    finally:
+        logger.info('Closing browser page and context.')
+        page.close()
+        context.close()
+
+'''
+Pytest options
+'''
 
 def pytest_addoption(parser):
 
