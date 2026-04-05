@@ -25,6 +25,13 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+## Build image and start container
+Note: This must be up-and-running for all local testing
+In WSL/VS Code Terminal:
+```bash
+docker compose up --build
+```
+
 ## Run app as stand-alone Python app
 In WSL/VS Code Terminal:
 ```bash
@@ -38,12 +45,6 @@ http://localhost:8000/
 In WSL/VS Code Terminal:
 ```bash
 pytest
-```
-
-## Build image and start container
-In WSL/VS Code Terminal:
-```bash
-docker compose up --build
 ```
 
 ## Configure Github Actions
