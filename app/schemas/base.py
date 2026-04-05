@@ -39,6 +39,25 @@ class UserCreate(UserBase, PasswordMixin):
 
     pass
 
+class UserRead(UserBase):
+
+    # Schema for user read
+
+    pass
+
+def get_clean_user(user):
+
+    # Return user, without the password field
+
+    user_read = UserRead(
+        first_name=user.first_name,
+        last_name=user.last_name,
+        email=user.email,
+        username=user.username,
+    )
+
+    return user_read
+
 class UserLogin(PasswordMixin):
 
     # Schema for user login

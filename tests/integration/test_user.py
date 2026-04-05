@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from unittest.mock import patch
 
 from app.models.user import User
+from app.schemas.base import get_clean_user
 from tests.conftest import create_fake_user
 from tests.conftest import managed_db_session
 
@@ -46,7 +47,7 @@ def test_session_handling(db_session):
         last_name='User',
         email='test1@example.com',
         username='testuser1',
-        password='password123',
+        password_hash='password123',
     )
     db_session.add(user1)
     db_session.commit()
@@ -63,7 +64,7 @@ def test_session_handling(db_session):
             last_name='User',
             email='test1@example.com',
             username='testuser2',
-            password='password456',
+            password_hash='password456',
         )
         db_session.add(user2)
         db_session.commit()
@@ -82,7 +83,7 @@ def test_session_handling(db_session):
         last_name='User',
         email='test3@example.com',
         username='testuser3',
-        password='password789',
+        password_hash='password789',
     )
     db_session.add(user3)
     db_session.commit()
@@ -243,7 +244,7 @@ def test_user_persistence_after_constraint(db_session):
         'last_name': 'User',
         'email': 'first@example.com',
         'username': 'firstuser',
-        'password': 'password123',
+        'password_hash': 'password123',
     }
     initial_user = User(** initial_user_data)
     db_session.add(initial_user)
@@ -256,7 +257,7 @@ def test_user_persistence_after_constraint(db_session):
             last_name='User',
             email='first@example.com',
             username='seconduser',
-            password='password456',
+            password_hash='password456',
         )
         db_session.add(duplicate_user)
         db_session.commit()
@@ -320,3 +321,29 @@ def test_authenticate_no_matching_user(db_session):
     # Test that authentication returns None if there is no matching user
 
     assert User.authenticate(db_session, 'fake_user_12345', 'password') is None
+
+def test_get_clean_user(db_session):
+
+    # Create a User using Faker-generated data and verify it is accessible (without password) in a UserRead class
+
+    user_data = create_fake_user()
+    logger.info(f'Creating user with data: {user_data}')
+
+    user = User(**user_data)
+    db_session.add(user)
+    db_session.commit()
+    db_session.refresh(user)
+
+    user_read = get_clean_user(user)
+
+    assert user_read.first_name == user_data['first_name']
+    assert user_read.last_name == user_data['last_name']
+    assert user_read.email == user_data['email']
+    assert user_read.username == user_data['username']
+
+    assert sorted(list(user_read.model_fields.keys())) == [
+        'email',
+        'first_name',
+        'last_name',
+        'username',
+    ]
